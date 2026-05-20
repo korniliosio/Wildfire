@@ -93,30 +93,30 @@ function MapView({ selectedLayer, selectedDate, metadata, showViirs, showLabels,
     loadStaticData();
   }, []);
 
-  useEffect(() => {
-    async function loadBundle() {
-      if (!selectedDate) return;
+    useEffect(() => {
+      async function loadBundle() {
+        if (!selectedDate) return;
 
-      try {
-        const response = await fetch(publicPath(`data/bundles/${selectedDate}.json`));
-        if (!response.ok) {
-          throw new Error(
-            `Failed to load bundle for ${selectedDate}: ${response.status}`
-          );
+        try {
+          const response = await fetch(publicPath(`data/bundles/${selectedDate}.json`));
+          if (!response.ok) {
+            throw new Error(
+              `Failed to load bundle for ${selectedDate}: ${response.status}`
+            );
+          }
+
+          const data = await response.json();
+          setBundleData(data);
+        } catch (err) {
+          console.error(err);
+          setError(err.message);
         }
-
-        const data = await response.json();
-        setBundleData(data);
-      } catch (err) {
-        console.error(err);
-        setError(err.message);
       }
-    }
 
-    loadBundle();
-  }, [selectedDate]);
+      loadBundle();
+    }, [selectedDate]);
 
-  useEffect(() => {
+    useEffect(() => {
     async function loadViirs() {
       if (!selectedDate || !showViirs) {
         setViirsData([]);
@@ -124,28 +124,36 @@ function MapView({ selectedLayer, selectedDate, metadata, showViirs, showLabels,
       }
 
       try {
-        const response = await fetch(publicPath(`data/viirs/${selectedDate}.json`));
+        const url = publicPath(`data/viirs/${selectedDate}.json`);
+        const response = await fetch(url);
 
         if (response.status === 404) {
           setViirsData([]);
           return;
         }
 
+        if (!response.ok) {
+          console.warn(
+            `VIIRS request failed for ${selectedDate}: ${response.status}`
+          );
+          setViirsData([]);
+          return;
+        }
+
         const contentType = response.headers.get("content-type") || "";
-        if (!response.ok || !contentType.includes("application/json")) {
-          if (!response.ok) {
-            console.error(
-              `Failed to load VIIRS for ${selectedDate}: ${response.status}`
-            );
-          }
+
+        if (!contentType.includes("application/json")) {
+          console.warn(
+            `VIIRS response for ${selectedDate} was not JSON: ${contentType}`
+          );
           setViirsData([]);
           return;
         }
 
         const data = await response.json();
-        setViirsData(data);
+        setViirsData(Array.isArray(data) ? data : []);
       } catch (err) {
-        console.error(err);
+        console.warn(`Could not load VIIRS for ${selectedDate}`, err);
         setViirsData([]);
       }
     }

@@ -3,7 +3,7 @@ import MapView from "./components/MapView";
 import TimeControls from "./components/TimeControls";
 import LayerSelector from "./components/LayerSelector";
 import { toPng } from "html-to-image";
-
+import { publicPath } from "./utils/paths";
 
   function App() {
     const [metadata, setMetadata] = useState(null);
@@ -63,8 +63,8 @@ import { toPng } from "html-to-image";
     async function loadAppConfig() {
       try {
         const [metadataResponse, datesResponse] = await Promise.all([
-          fetch("/data/metadata.json"),
-          fetch("/data/dates.json"),
+          fetch(publicPath("data/metadata.json")),
+          fetch(publicPath("data/dates.json"))
         ]);
 
         if (!metadataResponse.ok) {

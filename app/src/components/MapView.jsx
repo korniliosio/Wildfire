@@ -4,7 +4,7 @@ import { MapContainer, TileLayer, GeoJSON, CircleMarker, Tooltip, useMap } from 
 import InfoPanel from "./InfoPanel";
 import { Pane } from "react-leaflet";
 import { getInterpolator } from "./palettes";
-
+import { publicPath } from "../utils/paths";
 
 
 function FitBounds({ geojson }) {
@@ -58,7 +58,7 @@ function MapView({ selectedLayer, selectedDate, metadata, showViirs, showLabels,
   useEffect(() => {
     async function loadGrid() {
       try {
-        const response = await fetch("/data/grid.geojson");
+        const response = await fetch(publicPath("data/grid.geojson"));
         if (!response.ok) {
           throw new Error(`Failed to load grid.geojson: ${response.status}`);
         }
@@ -77,7 +77,7 @@ function MapView({ selectedLayer, selectedDate, metadata, showViirs, showLabels,
   useEffect(() => {
     async function loadStaticData() {
       try {
-        const response = await fetch("/data/static_data.json");
+        const response = await fetch(publicPath("data/static_data.json"));
         if (!response.ok) {
           throw new Error(`Failed to load static_data.json: ${response.status}`);
         }
@@ -98,7 +98,7 @@ function MapView({ selectedLayer, selectedDate, metadata, showViirs, showLabels,
       if (!selectedDate) return;
 
       try {
-        const response = await fetch(`/data/bundles/${selectedDate}.json`);
+        const response = await fetch(publicPath(`data/bundles/${selectedDate}.json`));
         if (!response.ok) {
           throw new Error(
             `Failed to load bundle for ${selectedDate}: ${response.status}`
@@ -124,7 +124,7 @@ function MapView({ selectedLayer, selectedDate, metadata, showViirs, showLabels,
       }
 
       try {
-        const response = await fetch(`/data/viirs/${selectedDate}.json`);
+        const response = await fetch(publicPath(`data/viirs/${selectedDate}.json`));
 
         if (response.status === 404) {
           setViirsData([]);

@@ -1,0 +1,192 @@
+{
+  "app": {
+    "title": "Wildfire Risk Explorer",
+    "default_date": "2023-01-01",
+    "default_layer": "p_fire_tomorrow"
+  },
+  "layers": [
+    {
+      "id": "p_fire_tomorrow",
+      "label": "Predicted Fire Risk",
+      "source": "dynamic",
+      "temporal": true,
+      "unit": "probability",
+      "format": "percent",
+      "palette": "Plasma",
+      "legend_type": "sequential",
+      "domain": [
+        0.0,
+        1.0
+      ]
+    },
+    {
+      "id": "temp_daily_max_C",
+      "label": "Maximum Temperature",
+      "source": "dynamic",
+      "temporal": true,
+      "unit": "\u00b0C",
+      "palette": "Inferno",
+      "legend_type": "sequential",
+      "domain": [
+        -10.0,
+        40.0
+      ]
+    },
+    {
+      "id": "rh_daily_min",
+      "label": "Minimum Relative Humidity",
+      "source": "dynamic",
+      "temporal": true,
+      "unit": "%",
+      "palette": "Blues",
+      "legend_type": "sequential",
+      "domain": [
+        0.0,
+        100.0
+      ]
+    },
+    {
+      "id": "wind_daily_max",
+      "label": "Maximum Wind Speed",
+      "source": "dynamic",
+      "temporal": true,
+      "unit": "m/s",
+      "palette": "PuBuGn",
+      "legend_type": "sequential",
+      "domain": [
+        0.0,
+        20.0
+      ]
+    },
+    {
+      "id": "slope_mean",
+      "label": "Slope",
+      "source": "static",
+      "temporal": false,
+      "unit": "degrees",
+      "palette": "Greys",
+      "legend_type": "sequential",
+      "domain": [
+        0.0,
+        90.0
+      ]
+    },
+    {
+      "id": "elev_mean",
+      "label": "Elevation",
+      "source": "static",
+      "temporal": false,
+      "unit": "m",
+      "palette": "Viridis",
+      "legend_type": "sequential",
+      "domain": [
+        0.0,
+        3000.0
+      ]
+    },
+    {
+      "id": "fuel_urban_frac",
+      "label": "Urban Fraction",
+      "source": "static",
+      "temporal": false,
+      "unit": "fraction",
+      "palette": "Greens",
+      "format": "percent",
+      "legend_type": "sequential",
+      "domain": [
+        0.0,
+        1.0
+      ]
+    },
+    {
+      "id": "fuel_agriculture_frac",
+      "label": "Agriculture Fraction",
+      "source": "static",
+      "temporal": false,
+      "unit": "fraction",
+      "palette": "PRGn",
+      "format": "percent",
+      "legend_type": "sequential",
+      "domain": [
+        0.0,
+        1.0
+      ]
+    },
+    {
+      "id": "fuel_grass_frac",
+      "label": "Grass Fraction",
+      "source": "static",
+      "temporal": false,
+      "unit": "fraction",
+      "palette": "PiYG",
+      "format": "percent",
+      "legend_type": "sequential",
+      "domain": [
+        0.0,
+        1.0
+      ]
+    },
+    {
+      "id": "fuel_shrub_frac",
+      "label": "Shrub Fraction",
+      "source": "static",
+      "temporal": false,
+      "unit": "fraction",
+      "palette": "PuOr",
+      "format": "percent",
+      "legend_type": "sequential",
+      "domain": [
+        0.0,
+        1.0
+      ]
+    },
+    {
+      "id": "fuel_forest_frac",
+      "label": "Forest Fraction",
+      "source": "static",
+      "temporal": false,
+      "unit": "fraction",
+      "palette": "BrBG",
+      "format": "percent",
+      "legend_type": "sequential",
+      "domain": [
+        0.0,
+        1.0
+      ]
+    },
+    {
+      "id": "fuel_nonburnable_frac",
+      "label": "Non-burnable Fraction",
+      "source": "static",
+      "temporal": false,
+      "unit": "fraction",
+      "palette": "Greys",
+      "format": "percent",
+      "legend_type": "sequential",
+      "domain": [
+        0.0,
+        1.0
+      ]
+    },
+    {
+      "id": "fuel_missing",
+      "label": "Fuel Missing Indicator",
+      "source": "static",
+      "temporal": false,
+      "unit": "binary",
+      "palette": "RdPu",
+      "legend_type": "categorical",
+      "domain": [
+        0,
+        1
+      ]
+    }
+  ]
+}
+
+
+
+
+
+
+

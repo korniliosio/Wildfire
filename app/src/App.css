@@ -29,7 +29,7 @@ body,
 }
 
 .app-shell {
-  height: 100%;
+  height: 100dvh;
   display: grid;
   grid-template-columns: 400px minmax(0, 1fr);
   background:
@@ -597,9 +597,11 @@ body,
 
 /* RESPONSIVE */
 
+/* RESPONSIVE */
+
 @media (max-width: 1100px) {
   .app-shell {
-    grid-template-columns: 300px minmax(0, 1fr);
+    grid-template-columns: 330px minmax(0, 1fr);
   }
 
   .map-layout {
@@ -607,6 +609,176 @@ body,
   }
 
   .side-panel {
+    max-height: 32dvh;
+  }
+}
+
+/* Tablet + mobile layout */
+@media (max-width: 900px) {
+  .app-shell {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  .left-sidebar {
+    width: 100%;
+    max-height: 42dvh;
+    padding: 12px;
+    overflow-y: auto;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .brand-card {
+    margin-bottom: 12px;
+  }
+
+  .brand-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+    font-size: 22px;
+  }
+
+  .brand-card h1 {
+    font-size: 18px;
+  }
+
+  .brand-card p {
+    font-size: 12px;
+  }
+
+  .control-card,
+  .summary-card,
+  .error-card {
+    border-radius: 16px;
+    padding: 12px;
+    margin-bottom: 10px;
+  }
+
+  .main-stage {
+    flex: 1;
+    min-height: 0;
+    height: auto;
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .top-bar {
+    height: auto;
+    min-height: 58px;
+    border-radius: 18px;
+    padding: 10px 12px;
+  }
+
+  .top-bar-title {
+    font-size: 17px;
+  }
+
+  .top-bar-subtitle {
+    font-size: 12px;
+  }
+
+  .status-pill {
     display: none;
+  }
+
+  .map-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 1fr) auto;
+    gap: 10px;
+  }
+
+  .map-wrapper {
+    border-radius: 20px;
+  }
+
+  .side-panel {
+    display: block;
+    max-height: 30dvh;
+    border-radius: 20px;
+  }
+
+  .legend {
+    right: 10px;
+    bottom: 10px;
+    min-width: 170px;
+    max-width: 210px;
+    padding: 10px;
+    border-radius: 16px;
+  }
+
+  .legend-title {
+    font-size: 13px;
+  }
+
+  .legend-label,
+  .legend-scale {
+    font-size: 11px;
+  }
+
+  .info-panel {
+    padding: 12px;
+  }
+
+  .info-panel-title {
+    font-size: 18px;
+  }
+
+  .info-row {
+    font-size: 12px;
+    padding: 6px 0;
+  }
+}
+
+/* Small phones */
+@media (max-width: 600px) {
+  .left-sidebar {
+    max-height: 38dvh;
+  }
+
+  .summary-card {
+    display: none;
+  }
+
+  .timeline-date-bar {
+    grid-template-columns: 44px 1fr 44px;
+  }
+
+  .timeline-arrow,
+  .timeline-icon-button {
+    height: 44px;
+    border-radius: 14px;
+  }
+
+  .timeline-date-input {
+    height: 44px;
+    font-size: 16px;
+    border-radius: 14px;
+    padding: 0 10px;
+  }
+
+  .timeline-play-row {
+    grid-template-columns: 52px 1fr;
+  }
+
+  .speed-segment {
+    height: 44px;
+  }
+
+  .layer-selector select,
+  .timeline-date-input,
+  .time-controls-row select {
+    font-size: 16px;
+  }
+
+  .legend {
+    display: none;
+  }
+
+  .side-panel {
+    max-height: 28dvh;
   }
 }

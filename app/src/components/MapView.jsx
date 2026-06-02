@@ -255,6 +255,9 @@ function onEachFeature(feature, layer) {
     },
 
     mouseover: () => {
+      const isTouchDevice =
+      typeof window !== "undefined" &&
+      ("ontouchstart" in window || navigator.maxTouchPoints > 0);
       const selected = buildSelectedCell(cellId);
 
       layer.setStyle({
@@ -301,15 +304,23 @@ function onEachFeature(feature, layer) {
             zoom={7}
             minZoom={6}
             maxZoom={13}
+
             zoomControl={false}
 
             zoomAnimation={true}
             fadeAnimation={true}
             markerZoomAnimation={true}
 
-            wheelPxPerZoomLevel={50}
-            zoomSnap={0.25}
-            zoomDelta={0.5}
+            wheelPxPerZoomLevel={70}
+            zoomSnap={0.5}
+            zoomDelta={0.75}
+
+            tap={true}
+            dragging={true}
+            touchZoom={true}
+            doubleClickZoom={true}
+            boxZoom={false}
+            keyboard={false}
 
             preferCanvas={true}
             attributionControl={true}

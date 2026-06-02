@@ -298,11 +298,22 @@ function onEachFeature(feature, layer) {
 
           <MapContainer
             center={[39.0, 22.0]}
-            zoom={6}
-            scrollWheelZoom={true}
-            zoomAnimation={false}
-            fadeAnimation={false}
-            markerZoomAnimation={false}
+            zoom={7}
+            minZoom={6}
+            maxZoom={13}
+            zoomControl={false}
+
+            zoomAnimation={true}
+            fadeAnimation={true}
+            markerZoomAnimation={true}
+
+            wheelPxPerZoomLevel={50}
+            zoomSnap={0.25}
+            zoomDelta={0.5}
+
+            preferCanvas={true}
+            attributionControl={true}
+
             className="map-container"
           >
             <TileLayer

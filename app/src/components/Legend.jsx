@@ -14,7 +14,7 @@ function formatLegendValue(value, format) {
 function Legend({ layerMeta }) {
   if (!layerMeta) return null;
 
-  const [min, max] = layerMeta.domain || [0, 1];
+  const [min, max] = layerMeta.viz_domain ||  layerMeta.domain || [0, 1];
 
   const interpolator = getInterpolator(layerMeta.palette);
 

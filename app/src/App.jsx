@@ -1,63 +1,51 @@
 import { useEffect, useMemo, useState } from "react";
 import MapView from "./components/MapView";
-import TimeControls from "./components/TimeControls";
 import LayerSelector from "./components/LayerSelector";
 import { toPng } from "html-to-image";
 import { publicPath } from "./utils/paths";
 
-  function App() {
+
+function formatPercent(value) {
+  if (value === null || value === undefined || Number.isNaN(value)) return "—";
+  return `${Math.round(value * 100)}%`;
+}
+
+function App() {
     const [metadata, setMetadata] = useState(null);
     const [dates, setDates] = useState([]);
     const [selectedLayer, setSelectedLayer] = useState(null);
     const [selectedDateIndex, setSelectedDateIndex] = useState(0);
     const [error, setError] = useState(null);
+
+    // Display states
     const [showViirs, setShowViirs] = useState(true);
     const [showLabels, setShowLabels] = useState(true);
+
+    // Layer info states
+    const [showLayerInfo, setShowLayerInfo] = useState(false);
+
+    // Daily summary states
+    const [dailyBundle, setDailyBundle] = useState(null);
+    const [showDailySummary, setShowDailySummary] = useState(false);
 
     async function handleExportMapFigure() {
       const mapElement = document.getElementById("map-capture-source");
       if (!mapElement) return;
 
-      const mapDataUrl = await toPng(mapElement, {
-        cacheBust: true,
-        pixelRatio: 2,
-        backgroundColor: "#ffffff",
-      });
-
-      const mapImage = new Image();
-      mapImage.src = mapDataUrl;
-
-      mapImage.onload = () => {
-        const headerHeight = 110;
-
-        const finalCanvas = document.createElement("canvas");
-        finalCanvas.width = mapImage.width;
-        finalCanvas.height = mapImage.height + headerHeight;
-
-        const ctx = finalCanvas.getContext("2d");
-
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
-
-        ctx.fillStyle = "#111827";
-        ctx.font = "bold 34px Arial";
-        ctx.fillText("Wildfire Risk Explorer", 32, 42);
-
-        ctx.fillStyle = "#64748b";
-        ctx.font = "bold 19px Arial";
-        ctx.fillText(
-          `Date: ${selectedDate} · Layer: ${selectedLayerMeta?.label || selectedLayer}`,
-          32,
-          76
-        );
-
-        ctx.drawImage(mapImage, 0, headerHeight);
+      try {
+        const mapDataUrl = await toPng(mapElement, {
+          cacheBust: true,
+          pixelRatio: 2,
+          backgroundColor: "#ffffff",
+        });
 
         const link = document.createElement("a");
         link.download = `wildfire-${selectedLayer}-${selectedDate}.png`;
-        link.href = finalCanvas.toDataURL("image/png");
+        link.href = mapDataUrl;
         link.click();
-      };
+      } catch (err) {
+        console.error("Failed to export map figure:", err);
+      }
     }
   useEffect(() => {
     async function loadAppConfig() {
@@ -93,20 +81,81 @@ import { publicPath } from "./utils/paths";
     loadAppConfig();
   }, []);
 
-  const selectedDate = useMemo(() => {
-    if (!dates.length) return null;
-    return dates[selectedDateIndex] || null;
-  }, [dates, selectedDateIndex]);
+    const selectedDate = useMemo(() => {
+      if (!dates.length) return null;
+      return dates[selectedDateIndex] || null;
+    }, [dates, selectedDateIndex]);
 
-  const selectedLayerMeta =
-    metadata?.layers?.find((layer) => layer.id === selectedLayer) || null;
+    const selectedLayerMeta =
+      metadata?.layers?.find((layer) => layer.id === selectedLayer) || null;
+
+    useEffect(() => {
+      async function loadDailyBundle() {
+        if (!selectedDate) {
+          setDailyBundle(null);
+          return;
+        }
+
+        try {
+          const response = await fetch(
+            publicPath(`data/bundles/${selectedDate}.json`)
+          );
+
+          if (!response.ok) {
+            setDailyBundle(null);
+            return;
+          }
+
+          const data = await response.json();
+          setDailyBundle(Array.isArray(data) ? data : []);
+        } catch (err) {
+          console.warn(`Could not load daily summary for ${selectedDate}`, err);
+          setDailyBundle(null);
+        }
+      }
+
+      loadDailyBundle();
+    }, [selectedDate]);
+
+    const dailySummary = useMemo(() => {
+      if (!dailyBundle || !dailyBundle.length) return null;
+
+      const risks = dailyBundle
+        .map((row) => row.p_fire_tomorrow)
+        .filter((value) => typeof value === "number" && !Number.isNaN(value));
+
+      if (!risks.length) return null;
+
+      const meanRisk =
+        risks.reduce((sum, value) => sum + value, 0) / risks.length;
+
+      const maxRisk = Math.max(...risks);
+
+      const highRiskCells = dailyBundle.filter(
+        (row) => row.p_fire_tomorrow >= 0.8
+      ).length;
+
+      const observedFireCells = dailyBundle.filter(
+        (row) => row.fire === 1
+      ).length;
+
+      return {
+        meanRisk,
+        maxRisk,
+        highRiskCells,
+        observedFireCells,
+        totalCells: dailyBundle.length,
+      };
+    }, [dailyBundle]);
 
   return (
     
     <div className="app-shell">
       <aside className="left-sidebar">
         <div className="brand-card">
-          <div className="brand-icon">🔥</div>
+          <div className="brand-icon">
+            <img src="./fire.png" alt="Fire icon" className="brand-image" />
+          </div>
           <div>
             <h1>Wildfire Risk Explorer</h1>
             <p>Next-day fire occurrence risk across Greece</p>
@@ -125,22 +174,105 @@ import { publicPath } from "./utils/paths";
               onLayerChange={setSelectedLayer}
             />
           )}
+        {selectedLayerMeta && (
+          <div className="layer-summary">
+            <p className="layer-description">
+              {selectedLayerMeta.description || "No description available."}
+            </p>
 
-           <div>
-              <span>Unit: </span>
-              <strong>{selectedLayerMeta?.unit || "—"}</strong>
+            <div className="layer-unit-row">
+              Unit: <strong>{selectedLayerMeta.unit || "—"}</strong>
+            </div>
+
+            <button
+              className="accordion-header"
+              onClick={() => setShowLayerInfo((v) => !v)}
+            >
+              <span>Layer information</span>
+              <span>{showDailySummary ? "−" : "+"}</span>
+            </button>
+
+            
+            {showLayerInfo && (
+              <div className="layer-info-expanded">
+                <div>
+                  <span>Type</span>
+                  <strong>{selectedLayerMeta.temporal ? "Temporal" : "Static"}</strong>
+                </div>
+
+                <div>
+                  <span>Source</span>
+                  <strong>
+                    {selectedLayerMeta.data_source || selectedLayerMeta.source || "—"}
+                  </strong>
+                </div>
+
+                <div>
+                  <span>Range</span>
+                  <strong>
+                    {selectedLayerMeta.domain
+                      ? `${selectedLayerMeta.domain[0]} – ${selectedLayerMeta.domain[1]}`
+                      : "—"}
+                  </strong>
+                </div>
+
+                {selectedLayerMeta.interpretation && (
+                  <div className="layer-interpretation">
+                    {selectedLayerMeta.interpretation}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
+        )}
         </section>
 
         <section className="control-card">
-          <div className="section-kicker">Timeline</div>
+          <button
+            className="accordion-header"
+            onClick={() => setShowDailySummary((value) => !value)}
+          >
+            <span>Daily Summary</span>
+            <span>{showDailySummary ? "−" : "+"}</span>
+          </button>
 
-          <TimeControls
-            dates={dates}
-            selectedDateIndex={selectedDateIndex}
-            onDateIndexChange={setSelectedDateIndex}
-          />
+          {showDailySummary && dailySummary && (
+            <div className="daily-summary-body">
+              <div className="summary-date">{selectedDate}</div>
+
+              <div className="daily-summary-grid">
+                <div>
+                  <span>Mean Risk</span>
+                  <strong>{formatPercent(dailySummary.meanRisk)}</strong>
+                </div>
+
+                <div>
+                  <span>Max Risk</span>
+                  <strong>{formatPercent(dailySummary.maxRisk)}</strong>
+                </div>
+
+                <div>
+                  <span>High Risk</span>
+                  <strong>{dailySummary.highRiskCells}</strong>
+                </div>
+
+                <div>
+                  <span>Fires Today</span>
+                  <strong>{dailySummary.observedFireCells}</strong>
+                </div>
+              </div>
+
+              <div className="summary-note">
+                Total cells: <strong>{dailySummary.totalCells}</strong>
+              </div>
+            </div>
+          )}
+
+          {showDailySummary && !dailySummary && (
+            <div className="summary-note">Loading daily summary…</div>
+          )}
         </section>
+        
         <section className="control-card">
 
         <div className="section-kicker">Observed Fires</div>
@@ -167,25 +299,15 @@ import { publicPath } from "./utils/paths";
       </label>
       </section>
 
+      <section className="sidebar-footer-actions">
+        <button className="export-utility-button" onClick={handleExportMapFigure}>
+          Export PNG
+        </button>
+      </section>
+
       </aside>
 
       <main className="main-stage">
-        <div className="top-bar">
-          <div>
-            <div className="top-bar-title">
-              {selectedLayerMeta?.label || "Map Layer"}
-            </div>
-            <div className="top-bar-subtitle">
-              {selectedDate
-                ? `Showing spatial values for ${selectedDate}`
-                : "Loading date range"}
-            </div>
-          </div>
-
-          <button className="export-button" onClick={handleExportMapFigure}>
-              Export PNG
-          </button>
-        </div>
 
         <MapView
           selectedLayer={selectedLayer}
@@ -193,8 +315,11 @@ import { publicPath } from "./utils/paths";
           metadata={metadata}
           showViirs={showViirs}
           showLabels={showLabels}
-        />
+          dates={dates}
+          selectedDateIndex={selectedDateIndex}
+          onDateIndexChange={setSelectedDateIndex}
 
+        />
         
       </main>
     </div>

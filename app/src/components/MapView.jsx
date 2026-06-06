@@ -1,7 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
 import L from "leaflet";
-import { MapContainer, TileLayer, GeoJSON, CircleMarker, Tooltip, useMap } from "react-leaflet";import Legend from "./Legend";
+import {
+  MapContainer,
+  TileLayer,
+  GeoJSON,
+  CircleMarker,
+  Tooltip,
+  Marker,
+  useMap,
+} from "react-leaflet";
 import InfoPanel from "./InfoPanel";
+import Legend from "./Legend";
+import TimeControls from "./TimeControls";
 import { Pane } from "react-leaflet";
 import { getInterpolator } from "./palettes";
 import { publicPath } from "../utils/paths";
@@ -33,7 +43,7 @@ function getColorForValue(value, layerMeta) {
     return "#d1d5db";
   }
 
-  const [min, max] = layerMeta?.domain || [0, 1];
+  const [min, max] = layerMeta?.viz_domain || layerMeta?.domain || [0, 1];
 
   const t = Math.max(
     0,
@@ -44,16 +54,36 @@ function getColorForValue(value, layerMeta) {
   return interpolator(t);
 }
 
-function MapView({ selectedLayer, selectedDate, metadata, showViirs, showLabels, exportMode = false }) {  
+function MapView({ selectedLayer, selectedDate, metadata, showViirs, showLabels, dates, selectedDateIndex, onDateIndexChange, exportMode = false }) {
   const [gridData, setGridData] = useState(null);
   const [bundleData, setBundleData] = useState(null);
   const [staticData, setStaticData] = useState(null);
   const [selectedCell, setSelectedCell] = useState(null);
   const [error, setError] = useState(null);
   const [viirsData, setViirsData] = useState([]);
+  const [selectedPosition, setSelectedPosition] = useState(null);
+  
 
   const selectedLayerMeta =
     metadata?.layers?.find((layer) => layer.id === selectedLayer) || null;
+
+  const selectedCellIcon = L.divIcon({
+    className: "selected-cell-pin",
+    html: "📍",
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+  });
+
+  const fireIcon = L.divIcon({
+    className: "viirs-fire-icon",
+    html: `
+      <div class="fire-marker">
+        🔥
+      </div>
+      `,
+    iconSize: [22, 22],
+    iconAnchor: [11, 11],
+  });
 
   useEffect(() => {
     async function loadGrid() {
@@ -251,7 +281,12 @@ function onEachFeature(feature, layer) {
 
   layer.on({
     click: () => {
+      const center = layer.getBounds().getCenter();
+
+      console.log("Selected cell center:", center);
+
       setSelectedCell(buildSelectedCell(cellId));
+      setSelectedPosition([center.lat, center.lng]);
     },
 
     mouseover: () => {
@@ -292,10 +327,22 @@ function onEachFeature(feature, layer) {
   const isLoading =
     !gridData || !staticData || (!bundleData && selectedLayerMeta?.source === "dynamic");
 
-  return (
-    <div className="map-layout">
-      <div className="map-panel">
-        <div id="map-capture-source" className="map-wrapper">
+return (
+  <div className="map-layout">
+    <div className="map-panel">
+      <div id="map-capture-source" className="map-wrapper">
+
+        <div className="map-title-overlay">
+          <div>
+            <h2>{selectedLayerMeta?.label || "Map Layer"}</h2>
+            <p>
+              {selectedDate
+                ? `Date: ${selectedDate}`
+                : "Loading date range"}
+            </p>
+          </div>
+        </div>
+
           {error && <div className="status error">Error: {error}</div>}
           {isLoading && !error && <div className="status">Loading map data…</div>}
 
@@ -342,18 +389,20 @@ function onEachFeature(feature, layer) {
               />
             )}
 
+            {selectedPosition && (
+              <Marker
+                position={selectedPosition}
+                icon={selectedCellIcon}
+                interactive={false}
+              />
+            )}
+
             {showViirs &&
               viirsData.map((fire, index) => (
-                <CircleMarker
+                <Marker
                   key={`${selectedDate}-${index}`}
-                  center={[fire.lat, fire.lon]}
-                  radius={5}
-                  pathOptions={{
-                    color: "#0b26ad",
-                    fillColor: "#2d12fa",
-                    fillOpacity: 0.9,
-                    weight: 1.5,
-                  }}
+                  position={[fire.lat, fire.lon]}
+                  icon={fireIcon}
                 >
                   <Tooltip>
                     <strong>VIIRS fire detection</strong>
@@ -362,7 +411,7 @@ function onEachFeature(feature, layer) {
                     <br />
                     Confidence: {fire.confidence}
                   </Tooltip>
-                </CircleMarker>
+                </Marker>
               ))}
             <Pane
                 name="hoverTooltip"
@@ -383,20 +432,38 @@ function onEachFeature(feature, layer) {
           </MapContainer>
 
           <Legend layerMeta={selectedLayerMeta} />
-        </div>
+
+          
+        {!exportMode && selectedCell && (
+            <div className="floating-info-panel">
+              <InfoPanel
+                selectedCell={selectedCell}
+                selectedLayerMeta={selectedLayerMeta}
+                selectedDate={selectedDate}
+                onClose={() => {
+                  setSelectedCell(null);
+                  setSelectedPosition(null);
+                }}
+              />
+            </div>
+          )}
+      
+      
       </div>
 
       {!exportMode && (
-        <div className="side-panel">
-          <InfoPanel
-            selectedCell={selectedCell}
-            selectedLayerMeta={selectedLayerMeta}
-            selectedDate={selectedDate}
+        <div className="map-timeline-dock">
+          <TimeControls
+            dates={dates}
+            selectedDateIndex={selectedDateIndex}
+            onDateIndexChange={onDateIndexChange}
           />
         </div>
       )}
     </div>
-  );
+  </div>
+);
+
 }
 
 export default MapView;

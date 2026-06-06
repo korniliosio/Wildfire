@@ -1,37 +1,35 @@
 import {
-  interpolatePlasma,
-  interpolateGreys,
-  interpolateBrBG,
-  interpolateViridis,
-  interpolatePiYG,
-  interpolatePuOr,
-  interpolatePRGn,
-  interpolatePuBuGn,
-  interpolateInferno,
   interpolateBlues,
-  interpolateRdPu,
-  interpolateYlOrRd,
   interpolateGreens,
   interpolateOranges,
+  interpolatePurples,
+  interpolateReds,
+  interpolateGreys,
+  interpolateBuGn,
+  interpolateBuPu,
+  interpolateOrRd,
+  interpolatePuRd,
+  interpolateYlOrRd,
+  interpolateYlGn,
+  interpolateYlGnBu,
 } from "d3-scale-chromatic";
 
 export const paletteLookup = {
-  Plasma: interpolatePlasma,
   Greys: interpolateGreys,
-  BrBG: interpolateBrBG,
-  Viridis: interpolateViridis,
-  PiYG: interpolatePiYG,
-  PuOr: interpolatePuOr,
-  PRGn: interpolatePRGn,
-  PuBuGn: interpolatePuBuGn,
-  Inferno: interpolateInferno,
   Blues: interpolateBlues,
-  RdPu: interpolateRdPu,
-  YlOrRd: interpolateYlOrRd,
   Greens: interpolateGreens,
   Oranges: interpolateOranges,
+  Reds: interpolateReds,
+  Purples: interpolatePurples,
+  BuGn: interpolateBuGn,
+  BuPu: interpolateBuPu,
+  OrRd: interpolateOrRd,
+  PuRd: interpolatePuRd,
+  YlOrRd: interpolateYlOrRd,
+  YlGn: interpolateYlGn,
+  YlGnBu: interpolateYlGnBu,
 };
 
 export function getInterpolator(paletteName) {
-  return paletteLookup[paletteName] || interpolateYlOrRd;
+  return paletteLookup[paletteName] || interpolateGreys;
 }

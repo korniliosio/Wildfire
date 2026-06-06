@@ -12,12 +12,15 @@
       "temporal": true,
       "unit": "probability",
       "format": "percent",
-      "palette": "Plasma",
+      "palette": "OrRd",
       "legend_type": "sequential",
       "domain": [
         0.0,
         1.0
-      ]
+      ],
+      "description": "Model-estimated probability of fire occurrence on the following day for each grid cell.",
+      "data_source": "XGBoost model output",
+      "interpretation": "Higher values indicate cells ranked as higher risk for next-day fire occurrence."
     },
     {
       "id": "temp_daily_max_C",
@@ -25,12 +28,16 @@
       "source": "dynamic",
       "temporal": true,
       "unit": "\u00b0C",
-      "palette": "Inferno",
+      "palette": "YlOrRd",
       "legend_type": "sequential",
       "domain": [
         -10.0,
         40.0
-      ]
+      ],
+      "viz_domain": [0,35],
+      "description": "Daily maximum air temperature aggregated to each grid cell.",
+      "data_source": "ERA5-Land",
+      "interpretation": "Higher values may indicate hotter and drier fire-weather conditions."
     },
     {
       "id": "rh_daily_min",
@@ -43,7 +50,10 @@
       "domain": [
         0.0,
         100.0
-      ]
+      ],
+      "description": "Daily minimum relative humidity aggregated to each grid cell.",
+      "data_source": "ERA5-Land",
+      "interpretation": "Lower values may indicate drier fire-weather conditions."
     },
     {
       "id": "wind_daily_max",
@@ -51,12 +61,16 @@
       "source": "dynamic",
       "temporal": true,
       "unit": "m/s",
-      "palette": "PuBuGn",
+      "palette": "Purples",
       "legend_type": "sequential",
       "domain": [
         0.0,
         20.0
-      ]
+      ],
+      "viz_domain": [0,15],
+      "description": "Daily maximum wind speed aggregated to each grid cell.",
+      "data_source": "ERA5-Land",
+      "interpretation": "Higher values may indicate windier conditions that can promote fire spread."
     },
     {
       "id": "slope_mean",
@@ -69,7 +83,10 @@
       "domain": [
         0.0,
         90.0
-      ]
+      ],
+      "description": "Mean terrain slope within the grid cell.",
+      "data_source": "DEM-derived topographic layer",
+      "interpretation": "Slope may influence accessibility, vegetation structure, and fire behaviour."
     },
     {
       "id": "elev_mean",
@@ -77,16 +94,36 @@
       "source": "static",
       "temporal": false,
       "unit": "m",
-      "palette": "Viridis",
+      "palette": "PuRd",
       "legend_type": "sequential",
       "domain": [
         0.0,
         3000.0
-      ]
+      ],
+      "description": "Mean elevation of the terrain within the grid cell.",
+      "data_source": "DEM-derived topographic layer",
+      "interpretation": "Elevation may influence climate, vegetation, and fire behaviour."
     },
     {
       "id": "fuel_urban_frac",
       "label": "Urban Fraction",
+      "source": "static",
+      "temporal": false,
+      "unit": "fraction",
+      "palette": "YlGnBu",
+      "format": "percent",
+      "legend_type": "sequential",
+      "domain": [
+        0.0,
+        1.0
+      ],
+      "description": "Fraction of the grid cell classified as urban/built-up area.",
+      "data_source": "Corine Land Cover",
+      "interpretation": "Higher values indicate more urbanized areas, which may have different fire risk profiles and fire behaviour compared to natural vegetation."
+    },
+    {
+      "id": "fuel_agriculture_frac",
+      "label": "Agriculture Fraction",
       "source": "static",
       "temporal": false,
       "unit": "fraction",
@@ -96,21 +133,10 @@
       "domain": [
         0.0,
         1.0
-      ]
-    },
-    {
-      "id": "fuel_agriculture_frac",
-      "label": "Agriculture Fraction",
-      "source": "static",
-      "temporal": false,
-      "unit": "fraction",
-      "palette": "PRGn",
-      "format": "percent",
-      "legend_type": "sequential",
-      "domain": [
-        0.0,
-        1.0
-      ]
+      ],
+      "description": "Fraction of the grid cell classified as agricultural land.",
+      "data_source": "Corine Land Cover",
+      "interpretation": "Higher values indicate more agricultural areas, which may have different fire risk profiles and fire behaviour compared to natural vegetation."
     },
     {
       "id": "fuel_grass_frac",
@@ -118,13 +144,16 @@
       "source": "static",
       "temporal": false,
       "unit": "fraction",
-      "palette": "PiYG",
+      "palette": "BuGn",
       "format": "percent",
       "legend_type": "sequential",
       "domain": [
         0.0,
         1.0
-      ]
+      ],
+      "description": "Fraction of the grid cell classified as grassland.",
+      "data_source": "Corine Land Cover",
+      "interpretation": "Higher values indicate more grassland areas, which may have different fire risk profiles and fire behaviour compared to other vegetation types."
     },
     {
       "id": "fuel_shrub_frac",
@@ -132,13 +161,16 @@
       "source": "static",
       "temporal": false,
       "unit": "fraction",
-      "palette": "PuOr",
+      "palette": "BuGn",
       "format": "percent",
       "legend_type": "sequential",
       "domain": [
         0.0,
         1.0
-      ]
+      ],
+      "description": "Fraction of the grid cell classified as shrubland.",
+      "data_source": "Corine Land Cover",
+      "interpretation": "Higher values indicate more shrubland areas, which may have different fire risk profiles and fire behaviour compared to other vegetation types."
     },
     {
       "id": "fuel_forest_frac",
@@ -146,13 +178,16 @@
       "source": "static",
       "temporal": false,
       "unit": "fraction",
-      "palette": "BrBG",
+      "palette": "YlGn",
       "format": "percent",
       "legend_type": "sequential",
       "domain": [
         0.0,
         1.0
-      ]
+      ],
+      "description": "Fraction of the grid cell classified as forest.",
+      "data_source": "Corine Land Cover",
+      "interpretation": "Higher values indicate more forested areas, which may have different fire risk profiles and fire behaviour compared to other vegetation types."
     },
     {
       "id": "fuel_nonburnable_frac",
@@ -166,20 +201,10 @@
       "domain": [
         0.0,
         1.0
-      ]
-    },
-    {
-      "id": "fuel_missing",
-      "label": "Fuel Missing Indicator",
-      "source": "static",
-      "temporal": false,
-      "unit": "binary",
-      "palette": "RdPu",
-      "legend_type": "categorical",
-      "domain": [
-        0,
-        1
-      ]
+      ],
+      "description": "Fraction of the grid cell classified as non-burnable land cover (e.g., water bodies, bare soil).",
+      "data_source": "Corine Land Cover",
+      "interpretation": "Higher values indicate more non-burnable areas, which may have lower fire risk and can act as natural firebreaks."
     }
   ]
 }

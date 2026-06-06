@@ -4,20 +4,23 @@ function formatValue(value) {
   return String(value);
 }
 
-function InfoPanel({ selectedCell, selectedLayerMeta, selectedDate }) {
+function InfoPanel({ selectedCell, selectedLayerMeta, selectedDate, onClose }) {
   if (!selectedCell) {
-    return (
-      <div className="info-panel">
-        <div className="info-panel-title">Cell Information</div>
-        <div className="info-panel-empty">Click a cell to inspect its values.</div>
-      </div>
-    );
-  }
+  return null;
+  } 
 
   return (
     <div className="info-panel">
-      <div className="info-panel-title">Cell Information</div>
+      <div className="info-panel-header">
+        <div>
+          <div className="info-panel-kicker">Selected Cell</div>
+          <div className="info-panel-title">Cell {selectedCell.cell_id}</div>
+        </div>
 
+        <button className="info-close-button" onClick={onClose}>
+          ×
+        </button>
+      </div>
       <div className="info-row">
         <span className="info-label">Cell ID</span>
         <span className="info-value">{selectedCell.cell_id}</span>

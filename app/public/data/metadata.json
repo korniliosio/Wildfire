@@ -84,6 +84,7 @@
         0.0,
         90.0
       ],
+      "viz_domain": [0,45],
       "description": "Mean terrain slope within the grid cell.",
       "data_source": "DEM-derived topographic layer",
       "interpretation": "Slope may influence accessibility, vegetation structure, and fire behaviour."

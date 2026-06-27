@@ -253,7 +253,7 @@ function MapView({ selectedLayer, selectedDate, metadata, showViirs, showLabels,
   const value = getLayerValue(cellId);
 
   const dynamicRow = dynamicLookup.get(cellId);
-  const hasObservedFire = dynamicRow?.fire === 1;
+  const hasObservedFire = showViirs && dynamicRow?.fire === 1;
 
   return {
     color: hasObservedFire ? "#111827" : "#555",
